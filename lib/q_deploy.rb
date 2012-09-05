@@ -7,26 +7,70 @@ configuration.load do
 		end
 	end
 
-	def stage
+	def current_stage
 		fetch(:stage, :integration).to_sym
 	end
 
 	def integration?
-		stage == :integration
+		current_stage == :integration
 	end
 
-	require 'railsless-deploy'
-	require 'capistrano/ext/multistage'
+	def shared_storage(path)
+		links = fetch(:shared_storage_paths, [])
+		links << path
+		set :shared_storage_paths, links
 
+		before "deploy:finalize_update", "q_shared_storage:link"
+		after "deploy:setup", "q_shared_storage:setup"
+	end
+
+	def drush(cmd)
+		drush = fetch(:drush, "drush")
+		run "cd #{drupal_path} && #{drush} #{cmd}"
+	end
+
+	namespace :q_shared_storage do
+		desc "Link shared storage."
+		task :link do
+			return if integration?
+			fetch(:shared_storage_paths, []).each do |path|
+				run "ln -nfs /dist/#{application}/#{path} #{release_path}/#{path}"
+			end
+		end
+
+		task :setup do
+			return if integration?
+			fetch(:shared_storage_paths, []).each do |path|
+				run "mkdir -p /dist/#{application}/#{path}"
+			end
+		end 
+	end
+
+	namespace :drupal do
+		desc "Run drush commands"
+
+		task :cca do
+			drush "cc all"
+		end
+
+		task :fra do
+			drush "-y fra"
+		end
+
+		task :updb do
+			drush "-y updb"
+		end
+	end
+	
 	_cset :stages, %w(integration production)
 	_cset :default_stage, "integration"
+	_cset(:drupal_path) {release_path}
 
-	_cset(:branch) {integration? ? "master" : "stable"}
+	_cset(:branch) {integration? ? "master" : "production"}
 
-	_cset :user, "sites"
-	_cset :scm, 'git'
+	set :scm, 'git'
 
-	_cset(:deploy_to){"/home/#{user}/apps/#{application}"}
+	set(:deploy_to){"/home/#{user}/apps/#{application}"}
 
 	_cset :use_sudo, false
 	_cset :group_writable, false
@@ -35,9 +79,19 @@ configuration.load do
 
 	_cset :git_shallow_clone, 1
 	_cset :git_enable_submodules, 1
-	_cset :ssh_options, {:forward_agent => true}
+	set :ssh_options, {:forward_agent => true}
+	default_run_options[:pty] = true
 
 	_cset :user, "sites"
 	role(:app) {integration? ? "vmma-001.openminds.be" : ["web-001.vmma.openminds.be", "web-002.vmma.openminds.be", "web-003.vmma.openminds.be"]}
 	role(:web) {integration? ? "vmma-001.openminds.be" : ["web-001.vmma.openminds.be", "web-002.vmma.openminds.be", "web-003.vmma.openminds.be"]}
+
+	require 'railsless-deploy'
+	require 'capistrano/ext/multistage'
+
+	stages.each do |stage|
+		task(stage) do
+			set :stage, stage.to_sym
+		end
+	end	
 end
