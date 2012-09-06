@@ -34,14 +34,15 @@ configuration.load do
 		task :link do
 			return if integration?
 			fetch(:shared_storage_paths, []).each do |path|
-				run "ln -nfs /dist/#{application}/#{path} #{release_path}/#{path}"
+				run "rm -rf #{release_path}/#{path}"
+				run "ln -nfs /dist/apps/#{application}/#{path} #{release_path}/#{path}"
 			end
 		end
 
 		task :setup do
 			return if integration?
 			fetch(:shared_storage_paths, []).each do |path|
-				run "mkdir -p /dist/#{application}/#{path}"
+				run "mkdir -p /dist/apps/#{application}/#{path}"
 			end
 		end 
 	end
@@ -49,15 +50,15 @@ configuration.load do
 	namespace :drupal do
 		desc "Run drush commands"
 
-		task :cca do
+		task :cca, :roles => :db do
 			drush "cc all"
 		end
 
-		task :fra do
+		task :fra, :roles => :db do
 			drush "-y fra"
 		end
 
-		task :updb do
+		task :updb, :roles => :db do
 			drush "-y updb"
 		end
 	end
@@ -85,6 +86,7 @@ configuration.load do
 	_cset :user, "sites"
 	role(:app) {integration? ? "vmma-001.openminds.be" : ["web-001.vmma.openminds.be", "web-002.vmma.openminds.be", "web-003.vmma.openminds.be"]}
 	role(:web) {integration? ? "vmma-001.openminds.be" : ["web-001.vmma.openminds.be", "web-002.vmma.openminds.be", "web-003.vmma.openminds.be"]}
+	role(:db) {integration? ? "vmma-001.openminds.be" : "web-001.vmma.openminds.be"}
 
 	require 'railsless-deploy'
 	require 'capistrano/ext/multistage'
