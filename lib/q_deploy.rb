@@ -79,14 +79,13 @@ configuration.load do
 	_cset :deploy_via, :remote_cache
 
 	_cset :git_shallow_clone, 1
-	_cset :git_enable_submodules, 1
 	set :ssh_options, {:forward_agent => true}
 	default_run_options[:pty] = true
 
 	_cset :user, "sites"
-	role(:app) {integration? ? "vmma-001.openminds.be" : ["web-001.vmma.openminds.be", "web-002.vmma.openminds.be", "web-003.vmma.openminds.be"]}
-	role(:web) {integration? ? "vmma-001.openminds.be" : ["web-001.vmma.openminds.be", "web-002.vmma.openminds.be", "web-003.vmma.openminds.be"]}
-	role(:db) {integration? ? "vmma-001.openminds.be" : "web-001.vmma.openminds.be"}
+	role(:app) {integration? ? "dev-001.vmma.openminds.be" : ["web-001.vmma.openminds.be", "web-002.vmma.openminds.be", "web-003.vmma.openminds.be"]}
+	role(:web) {integration? ? "dev-001.vmma.openminds.be" : ["web-001.vmma.openminds.be", "web-002.vmma.openminds.be", "web-003.vmma.openminds.be"]}
+	role(:db) {integration? ? "dev-001.vmma.openminds.be" : "web-001.vmma.openminds.be"}
 
 	require 'railsless-deploy'
 	require 'capistrano/ext/multistage'

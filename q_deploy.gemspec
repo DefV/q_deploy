@@ -2,10 +2,10 @@
 
 Gem::Specification.new do |s|
 	s.name = "q_deploy"
-	s.version = "0.0.2"
+	s.version = "0.0.5"
 
 	s.authors = ["Dimitri Van Heucke"]
-	s.date = "2012-09-06"
+	s.date = "2012-10-01"
 	s.description = "Deploy to Q servers"
 	s.summary = "Deployment for q-apps with Capistrano"
 	s.email = "dimitri@q-music.be"
