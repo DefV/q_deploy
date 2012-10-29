@@ -32,7 +32,7 @@ configuration.load do
 	namespace :q_shared_storage do
 		desc "Link shared storage."
 		task :link do
-			return if integration?
+			#next if integration?
 			fetch(:shared_storage_paths, []).each do |path|
 				run "rm -rf #{release_path}/#{path}"
 				run "ln -nfs /dist/apps/#{application}/#{path} #{release_path}/#{path}"
@@ -40,7 +40,7 @@ configuration.load do
 		end
 
 		task :setup do
-			return if integration?
+			#next if integration?
 			fetch(:shared_storage_paths, []).each do |path|
 				run "mkdir -p /dist/apps/#{application}/#{path}"
 			end
