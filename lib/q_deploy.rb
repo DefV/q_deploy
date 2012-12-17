@@ -95,4 +95,6 @@ configuration.load do
 			set :stage, stage.to_sym
 		end
 	end	
+
+	after 'deploy', 'deploy:cleanup'
 end
