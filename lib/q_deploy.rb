@@ -83,8 +83,8 @@ configuration.load do
 	default_run_options[:pty] = true
 
 	_cset :user, "sites"
-	role(:app) {integration? ? "dev-001.vmma.openminds.be" : ["web-001.vmma.openminds.be", "web-002.vmma.openminds.be", "web-003.vmma.openminds.be"]}
-	role(:web) {integration? ? "dev-001.vmma.openminds.be" : ["web-001.vmma.openminds.be", "web-002.vmma.openminds.be", "web-003.vmma.openminds.be"]}
+	role(:app) {integration? ? "dev-001.vmma.openminds.be" : ["web-001.vmma.openminds.be", "web-002.vmma.openminds.be", "web-003.vmma.openminds.be", "web-004.vmma.openminds.be", "web-005.vmma.openminds.be"]}
+	role(:web) {integration? ? "dev-001.vmma.openminds.be" : ["web-001.vmma.openminds.be", "web-002.vmma.openminds.be", "web-003.vmma.openminds.be", "web-004.vmma.openminds.be", "web-005.vmma.openminds.be"]}
 	role(:db) {integration? ? "dev-001.vmma.openminds.be" : "web-001.vmma.openminds.be"}
 
 	require 'railsless-deploy'
