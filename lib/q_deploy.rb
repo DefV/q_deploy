@@ -48,6 +48,20 @@ configuration.load do
 	end
 
 	namespace :drupal do
+
+		task :frchanges, :roles => :db do
+			from = source.next_revision(current_revision)
+			differences = run_locally source.local.scm(:diff, "--name-only", from, real_revision, 'sites/all/modules/features')
+			features = differences.split(/\n/).inject(Set.new) do |set, path|
+				feature = path[%r{sites/all/modules/features/([^/]+)},1]
+				set << feature
+				set
+			end
+			features.each do |feature|
+				drush "-y fr #{feature}"
+			end
+		end
+
 		desc "Run drush commands"
 
 		task :cca, :roles => :db do
@@ -56,6 +70,9 @@ configuration.load do
 
 		task :fra, :roles => :db do
 			drush "-y fra"
+			# Mappen loppen
+			# diff van die map met vorige release
+			# indien diff, fr mapname -y
 		end
 
 		task :updb, :roles => :db do
